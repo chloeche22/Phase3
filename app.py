@@ -12,6 +12,7 @@ from langchain.chains import create_history_aware_retriever
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain_core.messages import HumanMessage, AIMessage
 from dotenv import load_dotenv
 
 # 환경 변수 로드
@@ -25,7 +26,7 @@ def get_image_base64(image_path):
     with open(image_path, "rb") as img_file:
         return base64.b64encode(img_file.read()).decode('utf-8')
 
-# 이미지 경로 설정 (실제 경로로 변경해주세요)
+# 이미지 경로 설정 
 chatbot_image_path = "/mnt/c/Users/kec91/Desktop/capstone_git/static/판사.png"
 user_image_path = "/mnt/c/Users/kec91/Desktop/capstone_git/static/molu.png"
 logo_path = "/mnt/c/Users/kec91/Desktop/capstone_git/static/logo.png"
@@ -161,6 +162,12 @@ def main_app():
 
     # 현재 세션의 메시지 로드
     current_messages = user_sessions[st.session_state.current_session]["messages"]
+    
+    
+    # 최근 N개의 메시지만 사용하도록 설정
+    MAX_MESSAGES = 5  # 이 값을 조절하여 사용할 최근 메시지 수를 설정
+    recent_messages = current_messages[-MAX_MESSAGES:] if len(current_messages) > MAX_MESSAGES else current_messages
+
 
     # Chroma DB 디렉토리 경로
     persist_directory = "/mnt/c/Users/kec91/Desktop/capstone_git/vector_db"
@@ -175,7 +182,8 @@ def main_app():
     chat = ChatUpstage(upstage_api_key=os.getenv("UPSTAGE_API_KEY"))
 
     # 프롬프트 파일 경로
-    qa_system_prompt_path = os.path.join("/mnt/c/Users/kec91/Desktop/capstone_git/prompts", "qa_prompt.txt")
+    qa_system_prompt_path = os.path.join("/mnt/c/Users/kec91/Desktop/capstone_git/prompts", "qa_testpromt.txt")
+    
     contextualize_q_system_prompt_path = os.path.join("/mnt/c/Users/kec91/Desktop/capstone_git/prompts", "system_prompt.txt")
 
     # 프롬프트 파일 읽기
@@ -197,13 +205,16 @@ def main_app():
 
     # qa_prompt 정의
     qa_prompt = ChatPromptTemplate.from_messages([
-        ("system", qa_system_prompt),
-        MessagesPlaceholder("chat_history"),
-        ("human", "{input}"),
-    ])
+    ("system", qa_system_prompt),
+    MessagesPlaceholder("chat_history"),
+    ("human", "{input}"),
+    ("human", "Context: {context}")])
 
     # 체인 생성
-    question_answer_chain = create_stuff_documents_chain(chat, qa_prompt)
+    question_answer_chain = create_stuff_documents_chain(
+    chat, 
+    qa_prompt,
+    document_variable_name="context")
     rag_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain)
 
     # 채팅 메시지를 표시할 컨테이너
@@ -232,6 +243,12 @@ def main_app():
     # 사용자 입력 처리
     if prompt := st.chat_input("법률 관련 질문을 입력하세요."):
         current_messages.append({"role": "user", "content": prompt})
+        
+        # 최근 N개의 메시지만 포함하는 채팅 히스토리 생성
+        chat_history = [
+            HumanMessage(content=msg["content"]) if msg["role"] == "user" else AIMessage(content=msg["content"])
+            for msg in recent_messages
+        ]
         
         # AI의 답변을 받아서 저장하고, 보여주기
         with st.spinner("답변 생성 중..."):
