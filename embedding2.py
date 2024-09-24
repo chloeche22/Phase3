@@ -17,13 +17,13 @@ api_key = os.getenv("UPSTAGE_API_KEY")
 
 # 1. PDF 파일 목록 및 중요도 설정
 pdf_files_with_importance = [
-    ("/mnt/c/Users/kec91/Desktop/capstone_git/근로기준법(법률)(제18176호)(20211119).pdf", "high"),
-    ("/mnt/c/Users/kec91/Desktop/capstone_git/2023년 표준 취업규칙.pdf", "medium"),
-    ("/mnt/c/Users/kec91/Desktop/capstone_git/공단 취업규칙.pdf", "low")
+    ("/mnt/c/Users/kec91/Desktop/capstone_git/refer/근로기준법(법률)(제18176호)(20211119).pdf", "high"),
+    ("/mnt/c/Users/kec91/Desktop/capstone_git/refer/2023년 표준 취업규칙.pdf", "medium"),
+    ("/mnt/c/Users/kec91/Desktop/capstone_git/refer/공단 취업규칙.pdf", "low")
 ]
 
 # 2. 중요도에 따른 가중치 설정
-importance_weights = {"high": 5, "medium": 3, "low": 1}
+importance_weights = {"high": 5, "medium": 3, "low": 2}
 
 # 3. 임베딩 모델 설정
 embedding_function = UpstageEmbeddings(model="solar-embedding-1-large")

@@ -195,9 +195,10 @@ def main_app():
 
     # ChatUpstage 초기화
     chat = ChatUpstage(upstage_api_key=os.getenv("UPSTAGE_API_KEY"))
+    
 
     # 프롬프트 파일 경로
-    qa_system_prompt_path = os.path.join("/mnt/c/Users/kec91/Desktop/capstone_git/prompts", "qa_testpromt1.txt")
+    qa_system_prompt_path = os.path.join("/mnt/c/Users/kec91/Desktop/capstone_git/prompts", "qa_testpromt2.txt")
     contextualize_q_system_prompt_path = os.path.join("/mnt/c/Users/kec91/Desktop/capstone_git/prompts", "system_prompt.txt")
 
     # 프롬프트 파일 읽기
