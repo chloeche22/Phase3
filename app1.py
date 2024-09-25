@@ -44,61 +44,20 @@ st.markdown("""
     body {background-color: #e8e1d9;}
     .stApp, header, footer {background-color: #e8e1d9 !important;}
     .stTextInput > div > div > input {background-color: #f5f0e8; border: 1px solid #d0c8b5;}
-    .stButton > button {background-color: #b0102f; color: white;}
-    .stButton > button:hover {background-color: #b0102f;}
+    .stButton > button {background-color: #c41230; color: white;}
+    .stButton > button:hover {background-color: #9e0e26;}
     .chat-container {display: flex; flex-direction: column; padding: 10px;}
     .message {border-radius: 20px; padding: 10px 15px; margin-bottom: 10px; max-width: 70%; display: flex; align-items: flex-start;}
-    .user-message {background-color: #f5f0e8; color: #1c1c1c; align-self: flex-end; flex-direction: row-reverse; padding; margin-top: 2rem;}
+    .user-message {background-color: #f5f0e8; color: #1c1c1c; align-self: flex-end; flex-direction: row-reverse;}
+    .bot-message {background-color: #ffffff; color: #1c1c1c; align-self: flex-start;}
+    .message-content {margin: 0 10px;}
     .avatar {width: 30px; height: 30px; border-radius: 50%;}
     .logo-container {display: flex; justify-content: center; margin-bottom: 20px;}
     .logo {width: 80%; max-width: 300px;}
-    .sidebar-notification {
-    background-color: #f0f0f0;
-    border: 1px solid #d0c8b5;
-    border-radius: 10px;
-    padding: 10px;
-    margin-top: 20px;
-    font-size: 0.5em;}
-    .subtitle {
-    font-size: 1.2em;
-    margin-bottom: 20px;}
-    .logout-button {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 1000;}
     .main-logo-container {display: flex; justify-content: center; margin-bottom: 2rem;}
     .main-logo {width: 40%; max-width: 300px;}
-    .bot-message {
-        background-color: #ffffff;
-        color: #1c1c1c;
-        align-self: flex-start;
-        max-width: 70%;
-    }
-    .message-content {
-        margin: 0 10px;
-        display: flex;
-        flex-direction: column;
-    }
-    .evidence-docs {
-        background-color: #f0f0f0;
-        display: flex;
-        border: 1px solid #d0c8b5;
-        border-radius: 10px;
-        padding: 10px;
-        margin-bottom: 10px;
-        margin-top: 10px;
-        font-size: 0.9em;
-    }
-    .evidence-docs p {
-        margin: 5px 0;
-        padding: 10px;
-    }
 </style>
 """, unsafe_allow_html=True)
-
-
-
 
 
 # 로고 HTML
@@ -165,20 +124,7 @@ def truncate_messages(messages: List[Dict[str, str]], max_tokens: int) -> List[D
 
 # 로그인 페이지 (구현 추가)
 def login_page():
-    st.sidebar.markdown("""
-        🎓 **알림**    
-        해당 페이지는 고려대학교 BA과정
-        캡스톤 프로젝트로 진행하는
-        LLM 기반의 자연어 QA 시스템
-        PoC 페이지입니다    
-
-        🔒 누구나 계정을 생성할 수 있습니다
-
-        ⚠️ 계정의 pw는 등록 시 자동 해싱되므로 
-        계정 정보는 운영진도 알 수 없습니다.
-        pw를 잘 관리해주세요.
-    """)
-        
+    st.sidebar.title("Login / Register")
     st.markdown(f"""
     <div class="main-logo-container">
         <img src="data:image/png;base64,{logo}" class="main-logo">
@@ -208,17 +154,6 @@ def login_page():
 def main_app():
     st.sidebar.markdown(logo_html, unsafe_allow_html=True)
     
-    # 알림 섹션 추가
-    st.sidebar.markdown("""
-    📍 **알림**
-    * 작성해 주신 **피드백** 은 서비스 품질 목적으로 활용될 수 있습니다.
-    * `새 세션 만들기` 버튼을 누르면 새로운 대화주제로 시작합니다.
-    
-    ```
-    (마지막 업데이트 2024.09.25)
-    ```
-    """)
-    
     st.sidebar.title("세션 관리")
     user_sessions = get_user_sessions(st.session_state.user)
     
@@ -238,8 +173,7 @@ def main_app():
         return
 
     st.title("⚖️ Legal Advice AI Assistant")
-    st.markdown("<h4 style='font-size: 1.0em;'>`근로기준법`, `표준 취업규칙` 문서 기반으로 답변하는 봇입니다. <br> 이전 대화에 나눴던 내용들의 맥락을 파악하여 대답하는 멀티턴 대화를 지원합니다.</h3>", unsafe_allow_html=True)
-    
+
     # 현재 세션의 메시지 로드
     current_messages = user_sessions[st.session_state.current_session]["messages"]
     
@@ -301,47 +235,25 @@ def main_app():
     # 채팅 메시지를 표시할 컨테이너
     chat_container = st.container()
     
-# 메인 채팅 영역에 대화 표시
+    # 메인 채팅 영역에 대화 표시
     with chat_container:
-        st.markdown('<div class="chat-container" style="margin-bottom: 20px;">', unsafe_allow_html=True)
-
-        for i, message in enumerate(current_messages):
+        st.markdown('<div class="chat-container">', unsafe_allow_html=True)
+        for message in current_messages:
             if message['role'] == 'user':
                 st.markdown(f"""
-                <div class="message user-message" style="margin-bottom: 10px;">
-                    <img src="data:image/png;base64,{user_image}" class="avatar" style="margin-right: 10px;">
-                    <div class="message-content" ; padding: 10px; border-radius: 8px;">
-                        {message["content"]}
-                    </div>
+                <div class="message user-message">
+                    <img src="data:image/png;base64,{user_image}" class="avatar">
+                    <div class="message-content">{message["content"]}</div>
                 </div>
                 """, unsafe_allow_html=True)
             else:
-                bot_message_html = f"""
-                <div class="message bot-message" style="margin-bottom: 10px;">
-                    <img src="data:image/png;base64,{chatbot_image}" class="avatar" style="margin-right: 10px;">
-                    <div class="message-content" padding: 10px; border-radius: 8px;">
-                        {message["content"]}
-                    </div>
+                st.markdown(f"""
+                <div class="message bot-message">
+                    <img src="data:image/png;base64,{chatbot_image}" class="avatar">
+                    <div class="message-content">{message["content"]}</div>
                 </div>
-                """
-                st.markdown(bot_message_html, unsafe_allow_html=True)
-
-                # 이전 메시지가 사용자의 메시지이고 법률 관련 질문인 경우에만 근거 문서 추가
-                if i > 0 and is_legal_query(current_messages[i-1]["content"]):
-                    retrieved_docs = vectorstore.as_retriever().get_relevant_documents(message["content"])
-                    for doc in retrieved_docs[:2]:  # 근거 문서 2개만 표시
-                        meta = doc.metadata
-                        st.markdown(f"""
-                            <div class="evidence-doc" style="margin-bottom: 1px solid #ccc; margin-top: 10px; background-color: #f5f5f5; padding-top: 10px; padding: 10px;">
-                                <strong>📄 근거 문서:</strong>
-                                <p><strong>{meta['title']} - {meta['law_num']}조항</strong></p>
-                                <p style="font-size: 14px; color: #555;">(페이지: {meta['page']}, 출처: {meta['source']})</p>
-                                <p style="font-size: 14px; color: #555;">{doc.page_content[:150]}...</p>
-                            </div>
-                        """, unsafe_allow_html=True)
-        
+                """, unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
-
 
     # 사용자 입력 처리
     if prompt := st.chat_input("법률 관련 질문을 입력하세요."):
@@ -357,30 +269,51 @@ def main_app():
         with st.spinner("답변 생성 중..."):
             MAX_TOKENS = 1000  # 적절한 값으로 조정
             truncated_messages = truncate_messages(current_messages, MAX_TOKENS)
+            result = rag_chain.invoke(
+                {'input': prompt, 'chat_history': truncated_messages}
+            )
             
-            if "무엇을 도와" in prompt or "어떤 도움" in prompt:
-                full_response = "저는 법률 관련 질문에 대해 도움을 드릴 수 있습니다. <br>현재는 근로기준법, 표준 취업규칙 기반으로 답 할 수 있지만 앞으로는 다양한 법률 문서 기반으로 기본적인 정보와 조언을 제공할 수 있습니다. 구체적인 법률 문제나 궁금한 점이 있으시면 말씀해 주세요."
-            elif is_legal_query(prompt):
-                # 법률 관련 질문인 경우 retriever 사용
-                result = rag_chain.invoke(
-                    {'input': prompt, 'chat_history': truncated_messages}
-                )
-                full_response = result['answer']
-            else:
-                # 일반 대화인 경우 retriever 사용하지 않고 직접 ChatUpstage 모델 사용
-                response = chat([HumanMessage(content=prompt)])
-                full_response = response.content
+            full_response = result['answer']
 
         current_messages.append({"role": "assistant", "content": full_response})
         save_session_messages(st.session_state.user, st.session_state.current_session, current_messages)
         st.rerun()
-
 
     # 로그아웃 버튼
     if st.sidebar.button("로그아웃"):
         st.session_state.user = None
         st.session_state.logged_in = False
         st.rerun()
+        
+        # 로그아웃 버튼 (화면 오른쪽 하단에 고정)
+    logout_placeholder = st.empty()
+    with logout_placeholder.container():
+        if st.button("로그아웃", key="logout_button"):
+            st.session_state.user = None
+            st.session_state.logged_in = False
+            st.rerun()
+    
+    # 로그아웃 버튼 스타일링
+    st.markdown(
+        """
+        <style>
+        .logout-button {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+    st.markdown(
+        f"""
+        <div class="logout-button">
+            <button kind="secondary" class="stButton">로그아웃</button>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
 # 세션 관리 함수들 (이전과 동일)
 def create_new_session(username):
@@ -400,13 +333,6 @@ def save_session_messages(username, session_id, messages):
     sessions = load_data(SESSIONS_FILE)
     sessions[username][session_id]["messages"] = messages
     save_data(sessions, SESSIONS_FILE)
-
-def is_legal_query(message):
-    # 법률 관련 키워드 목록
-    legal_keywords = ['법', '규정', '조항', '권리', '의무', '계약', '소송', '법원', '판결', '근로', '임금', '해고', '퇴직', '노동', '특별휴가', '업무']
-    
-    # 메시지에 법률 관련 키워드가 포함되어 있는지 확인
-    return any(keyword in message for keyword in legal_keywords)
 
 # 메인 실행 부분
 if 'logged_in' not in st.session_state:
